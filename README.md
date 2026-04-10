@@ -4,8 +4,8 @@ A Claude Code skill that enables multi-agent orchestration via tmux. Spawn paral
 
 ## What it does
 
-- **Supervisor mode (Sage):** Claude becomes an orchestrator that spawns and coordinates worker agents in split tmux panes.
-- **Worker mode:** Each worker pane runs its own Claude session, receives task instructions from Sage, and reports back.
+- **Supervisor mode (Simon):** Claude becomes an orchestrator that spawns and coordinates worker agents in split tmux panes.
+- **Worker mode:** Each worker pane runs its own Claude session, receives task instructions from Simon, and reports back.
 ### Key capabilities
 
 - Spawn N worker panes with `/multi-agent workers=N`
@@ -44,11 +44,11 @@ To spawn workers immediately on load:
 /multi-agent workers=2
 ```
 
-### Sage commands (inside a supervisor session)
+### Simon commands (inside a supervisor session)
 
 ```bash
 # Spawn an additional worker
-source ~/.claude/scripts/multi-agent/spawn-workers 1
+~/.claude/scripts/multi-agent/spawn-workers 1
 
 # List active workers
 ~/.claude/scripts/multi-agent/list-workers

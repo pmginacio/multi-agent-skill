@@ -29,9 +29,9 @@ _ma_get_pane_id_by_worker_name() {
   done < <(tmux list-panes -F '#{pane_id}')
 }
 
-# Find Sage's pane by visual title in the current window
+# Find Simon's pane by @worker-name option in the current window
 _ma_get_sage_pane() {
-  tmux list-panes -F '#{pane_id} #{pane_title}' | awk '$2 == "Sage" { print $1; exit }'
+  _ma_get_pane_id_by_worker_name "Simon"
 }
 
 # List all panes in the current window that have @worker-name set

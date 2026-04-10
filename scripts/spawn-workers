@@ -9,7 +9,7 @@ n="${1:-1}"
 
 main_pane=$(_ma_get_sage_pane)
 if [[ -z "$main_pane" ]]; then
-  echo "Error: no pane titled 'Sage' found. Are you running inside a Sage session?" >&2
+  echo "Error: no pane titled 'Simon' found. Are you running inside a Simon session?" >&2
   exit 1
 fi
 
@@ -50,8 +50,8 @@ for name in "${picked[@]}"; do
   echo "Spawned worker '$name' in pane $pane"
 done
 
-# Tag Sage's pane so its name appears in the border
-_ma_set_worker_name "$main_pane" "Sage"
+# Tag Simon's pane so its name appears in the border
+_ma_set_worker_name "$main_pane" "Simon"
 
 # Enable pane border labels
 tmux set-option pane-border-status top

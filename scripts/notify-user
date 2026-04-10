@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# notify-user — show a tmux popup on Sage's pane alerting that a worker needs attention
+# notify-user — show a tmux popup on Simon's pane alerting that a worker needs attention
 # Called as a hook from worker panes; silently exits if not in a worker pane.
 set -euo pipefail
 
@@ -16,7 +16,7 @@ if [[ -z "$worker_name" ]]; then
   exit 0
 fi
 
-# Find Sage's pane
+# Find Simon's pane
 sage_pane=$(_ma_get_sage_pane)
 target="${sage_pane:-$TMUX_PANE}"
 
@@ -34,6 +34,6 @@ if (( now - last_used > 3 )); then
   tmux select-pane -t "$TMUX_PANE"
   tmux display-message -t "$TMUX_PANE" -d 4000 " [$worker_name] needs your attention "
 else
-  # User is active — show notification on Sage's pane without switching
+  # User is active — show notification on Simon's pane without switching
   tmux display-message -t "$target" -d 4000 " [$worker_name] needs your attention "
 fi
