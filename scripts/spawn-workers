@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+# spawn-workers [N] — spawn N worker panes (default: 1) in the current tmux window
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/_lib.sh"
+
+n="${1:-1}"
+
+main_pane=$(_ma_get_sage_pane)
+if [[ -z "$main_pane" ]]; then
+  echo "Error: no pane titled 'Sage' found. Are you running inside a Sage session?" >&2
+  exit 1
+fi
+
+used_names=$(_ma_used_worker_names)
+
+picked=()
+for name in "${_WORKER_NAMES[@]}"; do
+  if ! echo "$used_names" | grep -qx "$name"; then
+    picked+=("$name")
+    [[ ${#picked[@]} -eq $n ]] && break
+  fi
+done
+
+if [[ ${#picked[@]} -lt $n ]]; then
+  echo "Warning: only ${#picked[@]} unused worker name(s) available (requested $n)." >&2
+fi
+
+first_worker_pane=""
+for name in "${picked[@]}"; do
+  if [[ -z "$first_worker_pane" ]]; then
+    pane=$(tmux split-window -h -l 40% -P -F '#{pane_id}')
+    first_worker_pane="$pane"
+  else
+    pane=$(tmux split-window -v -t "$first_worker_pane" -P -F '#{pane_id}')
+  fi
+
+  _ma_set_worker_name "$pane" "$name"
+  tmux select-pane -t "$pane" -T "$name"
+  tmux set-option -t "$pane" allow-rename off
+  tmux send-keys -t "$pane" "claude" Enter
+  sleep 3
+  # Re-apply both title and user option after claude starts (title may be overridden)
+  _ma_set_worker_name "$pane" "$name"
+  tmux select-pane -t "$pane" -T "$name"
+  tmux send-keys -t "$pane" "/multi-agent role=worker main=$main_pane name=$name"
+  sleep 0.1
+  tmux send-keys -t "$pane" Enter
+  echo "Spawned worker '$name' in pane $pane"
+done
+
+tmux select-pane -t "$main_pane"
