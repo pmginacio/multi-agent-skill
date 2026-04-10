@@ -6,8 +6,6 @@ A Claude Code skill that enables multi-agent orchestration via tmux. Spawn paral
 
 - **Supervisor mode (Sage):** Claude becomes an orchestrator that spawns and coordinates worker agents in split tmux panes.
 - **Worker mode:** Each worker pane runs its own Claude session, receives task instructions from Sage, and reports back.
-- Workers are named from a fixed list: Wade, Wesley, Winston, Wyatt, Warren, Walter, Wilson, Wolf, Willis, Wendell.
-
 ### Key capabilities
 
 - Spawn N worker panes with `/multi-agent workers=N`
