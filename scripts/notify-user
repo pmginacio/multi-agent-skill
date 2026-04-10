@@ -26,4 +26,4 @@ if [[ "$active" == "1" ]]; then
   exit 0
 fi
 
-tmux display-popup -t "$target" -E -w 60 -h 3 -x C -y 0 "echo '[$worker_name] needs your attention' && sleep 3"
+tmux display-message -t "$target" -d 4000 " [$worker_name] needs your attention "
