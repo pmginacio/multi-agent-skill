@@ -50,4 +50,11 @@ for name in "${picked[@]}"; do
   echo "Spawned worker '$name' in pane $pane"
 done
 
+# Tag Sage's pane so its name appears in the border
+_ma_set_worker_name "$main_pane" "Sage"
+
+# Enable pane border labels
+tmux set-option pane-border-status top
+tmux set-option pane-border-format ' #{@worker-name} '
+
 tmux select-pane -t "$main_pane"
