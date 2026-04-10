@@ -20,4 +20,10 @@ fi
 sage_pane=$(_ma_get_sage_pane)
 target="${sage_pane:-$TMUX_PANE}"
 
+# Skip popup if target pane is already focused
+active=$(tmux display-message -t "$target" -p '#{pane_active}')
+if [[ "$active" == "1" ]]; then
+  exit 0
+fi
+
 tmux display-popup -t "$target" -E -w 60 -h 3 -x C -y 0 "echo '[$worker_name] needs your attention' && sleep 3"
