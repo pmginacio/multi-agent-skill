@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # notify-user — switch focus to a worker pane when it finishes a turn,
-# unless it is already the active pane.
+# unless the user is already active in another pane.
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -15,10 +15,22 @@ if [[ -z "$worker_name" ]]; then
   exit 0
 fi
 
-# Already focused — nothing to do
+# If this pane is already focused, nothing to do
 is_active=$(tmux list-panes -F '#{pane_id} #{pane_active}' | awk -v p="$TMUX_PANE" '$1==p{print $2}')
 if [[ "$is_active" == "1" ]]; then
   exit 0
 fi
 
-tmux select-pane -t "$TMUX_PANE"
+# Check if the user was recently active in any pane
+active_pane=$(tmux list-panes -F '#{pane_id} #{pane_active}' | awk '$2==1{print $1}')
+last_used=$(tmux display-message -t "$active_pane" -p '#{pane_last_used}')
+now=$(date +%s)
+
+if (( now - last_used > 3 )); then
+  # User is idle — switch focus to the worker pane
+  tmux select-pane -t "$TMUX_PANE"
+  tmux display-message -t "$TMUX_PANE" -d 4000 " [$worker_name] needs your attention "
+else
+  # User is active — notify without switching
+  tmux display-message -t "$TMUX_PANE" -d 4000 " [$worker_name] needs your attention "
+fi
