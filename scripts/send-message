@@ -30,10 +30,10 @@ timeout=30
 interval=0.5
 elapsed=0
 
-# Claude Code shows "? for shortcuts" in the status bar when idle (waiting for input)
-# and "esc to interrupt" when actively generating. Grepping for "for shortcuts" is
-# a heuristic — it depends on Claude Code's UI text not changing across versions.
-until tmux capture-pane -p -t "$pane" | grep -q "for shortcuts"; do
+# Claude Code shows "esc to interrupt" only while actively generating a response.
+# We block on that rather than waiting for a specific idle string, since there are
+# multiple valid idle states (e.g. "? for shortcuts", "accept edits", etc.).
+until ! tmux capture-pane -p -t "$pane" | grep -q "esc to interrupt"; do
   sleep "$interval"
   elapsed=$(echo "$elapsed + $interval" | bc)
   if (( $(echo "$elapsed >= $timeout" | bc -l) )); then
