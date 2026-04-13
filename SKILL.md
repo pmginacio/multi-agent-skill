@@ -27,11 +27,13 @@ When you receive your task, immediately set your task description in the border 
 ```
 Keep it short (5–8 words). Update it if your task changes.
 
-To report back to Simon at any time (progress update, question, or final result), run:
+To report back to Simon at any time (progress update, question, or final result, run:
 
 ```bash
 ~/.claude/scripts/multi-agent/send-message Simon '<your message here>'
 ```
+
+**Never use `tmux send-keys` directly** — always use `send-message`. It waits for the target prompt to be idle before injecting, preventing garbled input.
 
 **Always sign your messages with your name** and **notify Simon when your task is complete** with a short summary of what you did and any relevant output.
 
