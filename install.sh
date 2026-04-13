@@ -60,9 +60,27 @@ else
     echo "[ok] Added Notification hook -> $NOTIFY_CMD"
 fi
 
+# 5. Add Stop hook to ~/.claude/settings.json if not already present
+MARK_IDLE_CMD="$HOME/.claude/scripts/multi-agent/mark-idle"
+
+stop_hook_present=$(jq --arg cmd "$MARK_IDLE_CMD" \
+    '(.hooks.Stop // []) | map(.hooks // [] | map(select(.command == $cmd))) | flatten | length' \
+    "$SETTINGS")
+
+if [ "$stop_hook_present" -gt 0 ]; then
+    echo "[skip] Stop hook for '$MARK_IDLE_CMD' already in $SETTINGS"
+else
+    tmp=$(mktemp)
+    jq --arg cmd "$MARK_IDLE_CMD" \
+        '.hooks.Stop = ((.hooks.Stop // []) + [{"matcher": "", "hooks": [{"type": "command", "command": $cmd, "async": true}]}])' \
+        "$SETTINGS" > "$tmp" && mv "$tmp" "$SETTINGS"
+    echo "[ok] Added Stop hook -> $MARK_IDLE_CMD"
+fi
+
 echo ""
 echo "Installation complete."
 echo "  Skill:   $SKILL_DEST/SKILL.md"
 echo "  Scripts: $SCRIPTS_DEST/"
 echo "  Allowed: $ALLOW_ENTRY"
 echo "  Hook:    Notification -> $NOTIFY_CMD"
+echo "  Hook:    Stop -> $MARK_IDLE_CMD"

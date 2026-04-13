@@ -39,6 +39,7 @@ for name in "${picked[@]}"; do
   _ma_set_worker_name "$pane" "$name"
   tmux select-pane -t "$pane" -T "$name"
   tmux set-option -t "$pane" allow-rename off
+  touch "/tmp/claude-idle-${pane}"
   tmux send-keys -t "$pane" "claude" Enter
   sleep 3
   # Re-apply both title and user option after claude starts (title may be overridden)

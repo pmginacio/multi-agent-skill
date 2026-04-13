@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# mark-idle — touch the idle flag file for the current pane
+set -euo pipefail
+
+if [[ -z "${TMUX_PANE:-}" ]]; then
+  exit 0
+fi
+
+touch "/tmp/claude-idle-${TMUX_PANE}"
