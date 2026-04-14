@@ -26,18 +26,18 @@ while true; do
     current_hash=$(tmux capture-pane -t "$pane_id" -p 2>/dev/null | md5) || continue
     now=$(date +%s)
 
-    hash_file="$state_dir/${name}.hash"
-
-    prev_hash=""
-    [[ -f "$hash_file" ]] && prev_hash=$(cat "$hash_file")
+    state_file="$state_dir/${name}.${state}"
+    prev_hash=$(cat "$state_file" 2>/dev/null || true)
 
     if [[ "$current_hash" != "$prev_hash" ]]; then
-      echo "$current_hash" > "$hash_file"
+      # Content changed — write new hash into state file (also updates mtime)
+      echo "$current_hash" > "$state_file"
       if [[ "$state" == "waiting" ]]; then
         _ma_set_state "$name" "active"
       fi
     else
-      last_changed=$(stat -f %m "$hash_file" 2>/dev/null || echo "$now")
+      # Content unchanged — use state file mtime as last-changed timestamp
+      last_changed=$(stat -f %m "$state_file" 2>/dev/null || echo "$now")
       elapsed=$(( now - last_changed ))
       if [[ "$state" == "active" ]] && (( elapsed > WAIT_THRESHOLD )); then
         _ma_set_state "$name" "waiting"
