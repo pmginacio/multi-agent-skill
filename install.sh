@@ -5,7 +5,6 @@ REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SKILL_DEST="$HOME/.claude/skills/multi-agent"
 SCRIPTS_DEST="$HOME/.claude/scripts/multi-agent"
 SETTINGS="$HOME/.claude/settings.json"
-ALLOW_ENTRY="Bash(~/.claude/scripts/multi-agent/*)"
 
 echo "Installing multi-agent skill..."
 echo ""
@@ -24,24 +23,35 @@ for file in "$REPO_DIR/scripts/"*; do
     echo "[ok] scripts/$name -> $SCRIPTS_DEST/$name (executable)"
 done
 
-# 3. Add allow entry to ~/.claude/settings.json if not already present
+# 3. Add allow entries to ~/.claude/settings.json if not already present
 if [ ! -f "$SETTINGS" ]; then
     echo '{"permissions":{"allow":[]}}' > "$SETTINGS"
 fi
 
-already_present=$(jq --arg entry "$ALLOW_ENTRY" \
-    '(.permissions.allow // []) | map(select(. == $entry)) | length' \
-    "$SETTINGS")
+ALLOW_ENTRIES=(
+  "Bash(~/.claude/scripts/multi-agent/*)"  # skill scripts
+  "Bash(tmux *)"                            # tmux commands used in SKILL.md
+  "Bash(cat /tmp/*)"                        # pipe temp files to send-message
+  "Bash(rm -f /tmp/*)"                      # clean up temp files after use
+  "Write(/tmp/**)"                          # write temp files
+  # Edit/Write for the working directory are added dynamically at skill load
+  # time by scripts/scope-permissions, since the path varies per project.
+)
 
-if [ "$already_present" -gt 0 ]; then
-    echo "[skip] '$ALLOW_ENTRY' already in $SETTINGS"
-else
-    tmp=$(mktemp)
-    jq --arg entry "$ALLOW_ENTRY" \
-        '.permissions.allow = ((.permissions.allow // []) + [$entry])' \
-        "$SETTINGS" > "$tmp" && mv "$tmp" "$SETTINGS"
-    echo "[ok] Added '$ALLOW_ENTRY' to $SETTINGS"
-fi
+for entry in "${ALLOW_ENTRIES[@]}"; do
+    already_present=$(jq --arg e "$entry" \
+        '(.permissions.allow // []) | map(select(. == $e)) | length' \
+        "$SETTINGS")
+    if [ "$already_present" -gt 0 ]; then
+        echo "[skip] '$entry' already in $SETTINGS"
+    else
+        tmp=$(mktemp)
+        jq --arg e "$entry" \
+            '.permissions.allow = ((.permissions.allow // []) + [$e])' \
+            "$SETTINGS" > "$tmp" && mv "$tmp" "$SETTINGS"
+        echo "[ok] Added '$entry' to $SETTINGS"
+    fi
+done
 
 # 4. Add Stop hook to ~/.claude/settings.json if not already present
 MARK_IDLE_CMD="$HOME/.claude/scripts/multi-agent/mark-idle"
@@ -64,5 +74,4 @@ echo ""
 echo "Installation complete."
 echo "  Skill:   $SKILL_DEST/SKILL.md"
 echo "  Scripts: $SCRIPTS_DEST/"
-echo "  Allowed: $ALLOW_ENTRY"
 echo "  Hook:    Stop -> $MARK_IDLE_CMD"

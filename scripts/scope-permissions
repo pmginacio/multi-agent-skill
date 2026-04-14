@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# scope-permissions — add Edit and Write permissions for the current working directory.
+# Called by Simon on load so all agents can edit project files without authorization
+# prompts. Settings are written to ~/.claude/settings.json which is shared across
+# all Claude Code instances in the session.
+set -euo pipefail
+
+settings="$HOME/.claude/settings.json"
+cwd=$(pwd)
+
+for entry in "Edit($cwd/**)" "Write($cwd/**)"; do
+    present=$(jq --arg e "$entry" '(.permissions.allow // []) | map(select(. == $e)) | length' "$settings")
+    if [ "$present" -eq 0 ]; then
+        tmp=$(mktemp)
+        jq --arg e "$entry" '.permissions.allow += [$e]' "$settings" > "$tmp" && mv "$tmp" "$settings"
+        echo "Allowed: $entry"
+    fi
+done

@@ -36,7 +36,7 @@ To report back to Simon at any time (progress update, question, or final result)
 For longer messages (multi-line content, task results, code snippets), **write the content to a temp file first using the Write tool**, then pipe it — this avoids heredocs and shell quoting issues:
 
 ```bash
-cat /tmp/my-message.txt | ~/.claude/scripts/multi-agent/send-message Simon
+cat /tmp/my-message.txt | ~/.claude/scripts/multi-agent/send-message Simon && rm -f /tmp/my-message.txt
 ```
 
 **Never use `tmux send-keys` directly** — always use `send-message`. It waits for the target prompt to be idle before injecting, preventing garbled input.
@@ -73,7 +73,10 @@ You are the **supervisor** named **Simon**. Your job is to coordinate work acros
 Set your own pane title and register your identity on load:
 ```bash
 tmux select-pane -T "Simon" && tmux set-option -p @worker-name "Simon"
+~/.claude/scripts/multi-agent/scope-permissions
 ```
+
+`scope-permissions` adds `Edit` and `Write` for the current working directory to the shared settings so all agents can edit project files without authorization prompts.
 
 ## Current Environment
 
@@ -114,16 +117,19 @@ For short messages, pass inline:
 ~/.claude/scripts/multi-agent/send-message <worker_name> "<short message>"
 ```
 
-For longer task assignments or multi-line content, **write the content to a temp file using the Write tool** (no shell authorization required), then pipe it in:
+For longer task assignments or multi-line content, **write the content to a temp file using the Write tool** (no shell authorization required), then pipe it in.
+Please remember to clean up the files after use.
 ```bash
-cat /tmp/task-for-wade.txt | ~/.claude/scripts/multi-agent/send-message Wade
+cat /tmp/task-for-wade.txt | ~/.claude/scripts/multi-agent/send-message Wade && rm -f /tmp/task-for-wade.txt
 ```
 
-**Never use heredocs (`<<EOF`) or here-strings (`<<<`) to pass message content** — they require shell authorization and break on special characters. Use the Write tool + pipe instead.
+**Never use heredocs (`<<EOF`) or here-strings (`<<<`) to pass message content** — they require shell authorization and break on special characters.
+Use the Write tool + pipe instead.
 
 ## Closing Worker Sessions
 
-**Always ask the user before closing any worker.** Do not close workers unilaterally — even when a task is done. The user may want to review the worker's output, issue follow-up tasks, or keep the session open. Confirm which workers to close and only then run the appropriate command.
+**Always ask the user before closing any worker.** Do not close workers unilaterally — even when a task is done. 
+The user may want to review the worker's output, issue follow-up tasks, or keep the session open. Confirm which workers to close and only then run the appropriate command.
 
 ```bash
 # Close a single worker by name
