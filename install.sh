@@ -34,6 +34,7 @@ ALLOW_ENTRIES=(
   "Bash(cat /tmp/*)"                        # pipe temp files to send-message
   "Bash(rm -f /tmp/*)"                      # clean up temp files after use
   "Write(/tmp/**)"                          # write temp files
+  "Edit(/tmp/**)"                           # edit temp files
   # Edit/Write for the working directory are added dynamically at skill load
   # time by scripts/scope-permissions, since the path varies per project.
 )
