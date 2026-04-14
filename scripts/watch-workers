@@ -27,20 +27,17 @@ while true; do
     now=$(date +%s)
 
     hash_file="$state_dir/${name}.hash"
-    changed_file="$state_dir/${name}.changed"
 
     prev_hash=""
     [[ -f "$hash_file" ]] && prev_hash=$(cat "$hash_file")
 
     if [[ "$current_hash" != "$prev_hash" ]]; then
       echo "$current_hash" > "$hash_file"
-      echo "$now" > "$changed_file"
       if [[ "$state" == "waiting" ]]; then
         _ma_set_state "$name" "active"
       fi
     else
-      last_changed=$now
-      [[ -f "$changed_file" ]] && last_changed=$(cat "$changed_file")
+      last_changed=$(stat -f %m "$hash_file" 2>/dev/null || echo "$now")
       elapsed=$(( now - last_changed ))
       if [[ "$state" == "active" ]] && (( elapsed > WAIT_THRESHOLD )); then
         _ma_set_state "$name" "waiting"
