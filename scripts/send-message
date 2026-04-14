@@ -33,18 +33,16 @@ if [[ -z "$pane" ]]; then
   exit 1
 fi
 
-idle_flag="/tmp/claude-idle-${pane}"
 max_attempts=150  # 30s at 0.2s intervals
 attempts=0
-while [[ ! -f "$idle_flag" ]]; do
+while [[ "$(_ma_get_state "$name")" != "idle" ]]; do
   if (( attempts >= max_attempts )); then
-    echo "Error: timed out waiting for '$name' (pane $pane) to become idle." >&2
+    echo "Error: timed out waiting for '$name' to become idle." >&2
     exit 1
   fi
   sleep 0.2
   attempts=$(( attempts + 1 ))
 done
-rm -f "$idle_flag"
 _ma_set_state "$name" "active"
 
 tmux send-keys -t "$pane" -l "$message"

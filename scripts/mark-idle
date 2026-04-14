@@ -10,10 +10,6 @@ if [[ -z "${TMUX_PANE:-}" ]]; then
   exit 0
 fi
 
-# Keep the idle flag file for send-message compatibility
-touch "/tmp/claude-idle-${TMUX_PANE}"
-
-# Update state file if this pane belongs to a known worker
 worker_name=$(_ma_get_worker_name "$TMUX_PANE")
 if [[ -n "$worker_name" ]]; then
   _ma_set_state "$worker_name" "idle"
