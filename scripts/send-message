@@ -8,7 +8,7 @@ source "$SCRIPT_DIR/_lib.sh"
 name="${1:-}"
 shift || true
 
-# If no inline message is given, read from stdin (allows: cat /tmp/task.txt | send-message Wade)
+# If no inline message is given, read from stdin (allows: send-message Wade < /tmp/task.txt)
 if [[ $# -eq 0 ]]; then
   message="$(cat)"
 else
@@ -17,7 +17,7 @@ fi
 
 if [[ -z "$name" || -z "$message" ]]; then
   echo "Usage: send-message <name> <message>" >&2
-  echo "       cat /tmp/task.txt | send-message <name>" >&2
+  echo "       send-message <name> < /tmp/task.txt" >&2
   exit 1
 fi
 
@@ -46,5 +46,10 @@ while [[ ! -f "$idle_flag" ]]; do
 done
 rm -f "$idle_flag"
 
-tmux send-keys -t "$pane" "$message" Enter
+tmux send-keys -t "$pane" -l "$message"
+# send-keys -l delivers characters to the pty one by one; without a pause,
+# the Enter below arrives before Claude Code finishes processing the pasted
+# text and the submission is lost.
+sleep 0.3
+tmux send-keys -t "$pane" Enter
 echo "Sent to '$name' (pane $pane): $message"

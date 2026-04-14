@@ -81,12 +81,16 @@ scripts/       # Helper bash scripts
 ## Roadmap
 
 - [x] more visible contest name bold + task
-- [x] prevent messages getting garbled together
+- [?] prevent messages getting garbled together
+- [ ] do not close workers without asking
+- [ ] cat /tmp/wade-dtc-task.txt | ~/.claude/scripts/multi-agent/send-message Wade just pastes the text does not trigger
+- [ ] focus shift is not working correctly. shift somewhat randomly and for no reason
 - [ ] have at most two worker windows but more workers
 - [ ] add a pool of tasks 
 - [ ] focus moves worker view to the top, once it continues cycle to the next worker who asked for the user
 - [ ] optional sound when a worker needs help
 - [ ] set permissions to run scripts on install or when loading the skill ?
   - [ ] allow all workers to edit files in the working directory
+  - [ ] allow all workers to edit files in /tmp
   - [ ] allow all workest to use the scripts in the skill
 - [ ] add instructions for workers to make independent checkouts/worktrees to work on

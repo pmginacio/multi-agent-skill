@@ -123,6 +123,8 @@ cat /tmp/task-for-wade.txt | ~/.claude/scripts/multi-agent/send-message Wade
 
 ## Closing Worker Sessions
 
+**Always ask the user before closing any worker.** Do not close workers unilaterally — even when a task is done. The user may want to review the worker's output, issue follow-up tasks, or keep the session open. Confirm which workers to close and only then run the appropriate command.
+
 ```bash
 # Close a single worker by name
 ~/.claude/scripts/multi-agent/close-worker Wade
