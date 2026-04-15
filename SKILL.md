@@ -45,6 +45,8 @@ cat /tmp/my-message.txt | ~/.claude/scripts/multi-agent/send-message Simon && rm
 
 **Never reply by writing text in your pane.** Output written to your pane is only visible to someone physically looking at it — Simon will not see it. All communication must go through `send-message`.
 
+**Ask Simon if anything is unclear.** If a task is ambiguous or you need more information before proceeding, send a message asking for clarification rather than making assumptions.
+
 **Notify Simon when your task is complete** with a short summary of what you did and any relevant output. Do not sign messages with your name — `send-message` prepends it automatically.
 
 Wait for your task instructions — they will follow in the next message.
