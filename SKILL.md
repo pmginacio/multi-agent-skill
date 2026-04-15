@@ -43,6 +43,8 @@ cat /tmp/my-message.txt | ~/.claude/scripts/multi-agent/send-message Simon && rm
 
 **Never use heredocs (`<<EOF`) or here-strings (`<<<`) to pass message content** — they require shell authorization and are fragile. Write to a file with the Write tool instead, then pipe.
 
+**Never reply by writing text in your pane.** Output written to your pane is only visible to someone physically looking at it — Simon will not see it. All communication must go through `send-message`.
+
 **Notify Simon when your task is complete** with a short summary of what you did and any relevant output. Do not sign messages with your name — `send-message` prepends it automatically.
 
 Wait for your task instructions — they will follow in the next message.
@@ -109,6 +111,10 @@ To spawn a single additional worker at any time:
 ```bash
 tmux set-option -p @worker-name "Simon" && ~/.claude/scripts/multi-agent/spawn-workers 1
 ```
+
+## Replying to Workers
+
+When a worker sends you a message, always reply via `send-message` — do not just type a response in your own pane, as the worker will not see it.
 
 ## Sending a Message to a Worker
 
