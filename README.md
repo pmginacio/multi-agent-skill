@@ -63,6 +63,17 @@ To spawn workers immediately on load:
 ~/.claude/scripts/multi-agent/close-workers
 ```
 
+## Settings & hooks
+
+When Simon loads, it writes two things to `.claude/settings.local.json` in the current working directory:
+
+- **Permissions** — allows skill scripts, tmux commands, `/tmp` access, and project file edits for all agents in the session.
+- **Stop hook** — marks workers as idle after each turn so `send-message` knows when they're ready.
+
+Permissions are project-scoped and persist after the session ends. They only apply when Claude Code runs from that directory, so they don't bleed into other projects. The Stop hook is temporary — `watch-workers` removes it automatically when the session ends (whether via `close-workers` or when the tmux session closes).
+
+`.claude/settings.local.json` is a local override file and is typically gitignored. If your project doesn't already ignore it, add it to `.gitignore`.
+
 ## Repository structure
 
 ```
@@ -92,5 +103,6 @@ scripts/       # Helper bash scripts
 - [x] set permissions to run scripts on install or when loading the skill ?
   - [x] allow all workers to edit files in the working directory
   - [x] allow all workers to edit files in /tmp
-  - [x] allow all workest to use the scripts in the skill
+  - [x] allow all workers to use the scripts in the skill
+  - [x] project-scoped settings only — permissions and hooks written to .claude/settings.local.json, hook removed on session end
 - [ ] add instructions for workers to make independent checkouts/worktrees to work on

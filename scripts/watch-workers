@@ -7,6 +7,23 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/_lib.sh"
 
+cleanup() {
+    local settings=".claude/settings.local.json"
+    local mark_idle="$HOME/.claude/scripts/multi-agent/mark-idle"
+    if [[ -f "$settings" ]]; then
+        local tmp
+        tmp=$(mktemp)
+        jq --arg cmd "$mark_idle" '
+            .hooks.Stop = ((.hooks.Stop // []) | map(select(
+                (.hooks // [] | map(select(.command == $cmd)) | length) == 0
+            )))
+        ' "$settings" > "$tmp" && mv "$tmp" "$settings"
+    fi
+}
+trap cleanup EXIT
+
+session_name=$(tmux display-message -p '#{session_name}' 2>/dev/null)
+
 POLL_INTERVAL=2   # seconds between checks
 WAIT_THRESHOLD=15 # seconds of unchanged pane content before marking a worker as waiting
 
@@ -16,6 +33,10 @@ echo $$ > "$state_dir/watcher.pid"
 
 while true; do
   sleep "$POLL_INTERVAL"
+
+  if ! tmux has-session -t "$session_name" 2>/dev/null; then
+    exit 0
+  fi
 
   while IFS=' ' read -r pane_id name; do
     [[ "$name" == "Simon" ]] && continue

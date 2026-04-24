@@ -1,10 +1,13 @@
 #!/usr/bin/env bash
-# ensure-hook — idempotently add the Stop hook to ~/.claude/settings.json.
+# ensure-hook — idempotently add the Stop hook to .claude/settings.local.json
+# in the current working directory (project-scoped settings).
 # Called by Simon on load so the skill self-installs its harness integration
 # without requiring manual install.sh steps.
 set -euo pipefail
 
-settings="$HOME/.claude/settings.json"
+settings=".claude/settings.local.json"
+
+mkdir -p .claude
 
 if [ ! -f "$settings" ]; then
     echo '{"permissions":{"allow":[]}}' > "$settings"

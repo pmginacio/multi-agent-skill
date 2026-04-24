@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
-# scope-permissions — add required permissions to ~/.claude/settings.json.
-# Called by Simon on load so all agents can run skill scripts and edit project
-# files without authorization prompts. Settings are shared across all Claude
-# Code instances in the session.
+# scope-permissions — add required permissions to .claude/settings.local.json
+# in the current working directory. Called by Simon on load so all agents can
+# run skill scripts and edit project files without authorization prompts.
 set -euo pipefail
 
-settings="$HOME/.claude/settings.json"
+settings=".claude/settings.local.json"
 cwd=$(pwd)
 
+mkdir -p .claude
 if [ ! -f "$settings" ]; then
     echo '{"permissions":{"allow":[]}}' > "$settings"
 fi
