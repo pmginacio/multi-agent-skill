@@ -7,6 +7,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/_lib.sh"
 
+# this deamon will clean up the hook that is used by the skill on EXIT
 cleanup() {
     local settings=".claude/settings.local.json"
     local mark_idle="$HOME/.claude/scripts/multi-agent/mark-idle"
